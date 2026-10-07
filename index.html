@@ -1,1 +1,230 @@
-Hello, World!
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>我的个人小站</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body {
+        /* 渐变+噪点质感背景，液态玻璃适配 */
+        background: linear-gradient(160deg, #e8f0fe 0%, #f0f4f9 100%);
+        color: #2d3748;
+        line-height: 1.6;
+        padding-top: 120px;
+        background-image:
+          linear-gradient(160deg, #e8f0fe 0%, #f0f4f9 100%),
+          url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        background-blend-mode: soft-light;
+        background-size:
+          100% 100%,
+          120px 120px;
+        background-attachment: fixed;
+      }
+
+      /* ===== 苹果液态玻璃风格 长胶囊开关【左上角固定】===== */
+      .toggle-wrap {
+        position: fixed;
+        top: 24px;
+        left: 24px;
+        z-index: 999;
+      }
+      .glass-toggle {
+        width: 220px;
+        height: 56px;
+        background: rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow:
+          0 4px 18px rgba(0, 0, 0, 0.08),
+          inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      .glass-toggle-slider {
+        width: 104px;
+        height: 44px;
+        background: #2575fc;
+        border-radius: 999px;
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        transition: left 0.35s cubic-bezier(0.2, 0, 0.2, 1);
+        box-shadow: 0 2px 10px rgba(37, 117, 252, 0.35);
+      }
+      .glass-toggle.active .glass-toggle-slider {
+        left: 110px;
+      }
+      .toggle-text-left,
+      .toggle-text-right {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px;
+        font-weight: 500;
+        pointer-events: none;
+      }
+      .toggle-text-left {
+        left: 24px;
+        color: #222;
+      }
+      .toggle-text-right {
+        right: 24px;
+        color: #444;
+      }
+      .glass-toggle.active .toggle-text-left {
+        color: #444;
+      }
+      .glass-toggle.active .toggle-text-right {
+        color: #fff;
+      }
+
+      /* 内容容器 */
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .about-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+      }
+      .post-card {
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .post-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      }
+      .post-card a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .post-card h2 {
+        color: #2b6cb0;
+        font-size: 1.4rem;
+      }
+      .post-date {
+        color: #718096;
+        font-size: 14px;
+        margin: 6px 0;
+      }
+      /* 两个区块，默认帖子区域隐藏 */
+      #section-intro {
+        display: block;
+      }
+      #section-posts {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 左上角液态玻璃开关 -->
+    <div class="toggle-wrap">
+      <div class="glass-toggle" id="switchBtn">
+        <div class="glass-toggle-slider"></div>
+        <span class="toggle-text-left">个人介绍</span>
+        <span class="toggle-text-right">帖子分享</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- 【区块1：个人介绍】JS在这里动态生成卡片 -->
+      <div id="section-intro">
+        <div id="intro-card-container"></div>
+      </div>
+
+      <!-- 【区块2：帖子分享】默认隐藏，点开开关才显示 -->
+      <div id="section-posts">
+        <h2>我的分享</h2>
+        <!-- 第一篇帖子卡片 -->
+        <div class="post-card">
+          <a href="./posts/post1.html">
+            <h2>第一篇帖子标题</h2>
+            <div class="post-date">2026-10-07</div>
+            <p>这里写帖子简短摘要，简单介绍内容。</p>
+          </a>
+        </div>
+        <!-- 以后新增帖子，继续复制上面post-card -->
+      </div>
+    </div>
+
+    <script>
+      const switchBtn = document.getElementById("switchBtn");
+      const intro = document.getElementById("section-intro");
+      const posts = document.getElementById("section-posts");
+      let isPostMode = false;
+
+      switchBtn.addEventListener("click", () => {
+        isPostMode = !isPostMode;
+        switchBtn.classList.toggle("active");
+        if (isPostMode) {
+          intro.style.display = "none";
+          posts.style.display = "block";
+        } else {
+          intro.style.display = "block";
+          posts.style.display = "none";
+        }
+      });
+
+      const introContainer = document.getElementById("intro-card-container");
+
+      // 循环尝试 post1 post2 post3... 遇到不存在就停止
+      async function loadIntroCards() {
+        let i = 1;
+        while (true) {
+          const folderName = `post${i}`;
+          const metaUrl = `./intro/${folderName}/meta.json`;
+          try {
+            const resp = await fetch(metaUrl);
+            if (!resp.ok) throw new Error("not found");
+            const meta = await resp.json();
+
+            const cardDom = document.createElement("div");
+            cardDom.className = "post-card";
+            // 点击卡片跳转到 detail.html，带上post编号
+            cardDom.innerHTML = `
+              <a href="detail.html?post=${i}">
+                <h2>${meta.title}</h2>
+                <div class="post-date">${meta.date}</div>
+                <p>${meta.desc}</p>
+              </a>
+            `;
+            introContainer.appendChild(cardDom);
+            i++;
+          } catch (err) {
+            console.log(`找不到 ${folderName}，结束遍历`);
+            break;
+          }
+        }
+      }
+
+      loadIntroCards();
+    </script>
+  </body>
+</html>
