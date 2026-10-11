@@ -13,7 +13,6 @@
       }
 
       body {
-        /* 渐变+噪点质感背景，液态玻璃适配 */
         background: linear-gradient(160deg, #e8f0fe 0%, #f0f4f9 100%);
         color: #2d3748;
         line-height: 1.6;
@@ -95,15 +94,6 @@
         margin: 0 auto;
         padding: 0 20px;
       }
-      .about-card {
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        margin-bottom: 2rem;
-      }
       .post-card {
         background: rgba(255, 255, 255, 0.75);
         backdrop-filter: blur(10px);
@@ -134,6 +124,11 @@
         font-size: 14px;
         margin: 6px 0;
       }
+      .section-title {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+        color: #2d3748;
+      }
       /* 两个区块，默认帖子区域隐藏 */
       #section-intro {
         display: block;
@@ -154,23 +149,15 @@
     </div>
 
     <div class="container">
-      <!-- 【区块1：个人介绍】JS在这里动态生成卡片 -->
+      <!-- 【区块1：个人介绍】默认显示，动态生成卡片 -->
       <div id="section-intro">
         <div id="intro-card-container"></div>
       </div>
 
-      <!-- 【区块2：帖子分享】默认隐藏，点开开关才显示 -->
+      <!-- 【区块2：帖子分享】默认隐藏，动态生成卡片 -->
       <div id="section-posts">
-        <h2>我的分享</h2>
-        <!-- 第一篇帖子卡片 -->
-        <div class="post-card">
-          <a href="./posts/post1.html">
-            <h2>第一篇帖子标题</h2>
-            <div class="post-date">2026-10-07</div>
-            <p>这里写帖子简短摘要，简单介绍内容。</p>
-          </a>
-        </div>
-        <!-- 以后新增帖子，继续复制上面post-card -->
+        <h2 class="section-title">我的分享</h2>
+        <div id="posts-card-container"></div>
       </div>
     </div>
 
@@ -192,14 +179,15 @@
         }
       });
 
-      const introContainer = document.getElementById("intro-card-container");
-
-      // 循环尝试 post1 post2 post3... 遇到不存在就停止
-      async function loadIntroCards() {
+      // 通用卡片加载函数：循环读取 post1 post2 post3...，遇到不存在就停止
+      // folderPath: 读取哪个文件夹（intro / posts）
+      // type: 传给详情页的参数，决定detail.html读哪个文件夹
+      async function loadCards(containerId, folderPath, type) {
+        const container = document.getElementById(containerId);
         let i = 1;
         while (true) {
           const folderName = `post${i}`;
-          const metaUrl = `./intro/${folderName}/meta.json`;
+          const metaUrl = `./${folderPath}/${folderName}/meta.json`;
           try {
             const resp = await fetch(metaUrl);
             if (!resp.ok) throw new Error("not found");
@@ -207,24 +195,26 @@
 
             const cardDom = document.createElement("div");
             cardDom.className = "post-card";
-            // 点击卡片跳转到 detail.html，带上post编号
             cardDom.innerHTML = `
-              <a href="detail.html?post=${i}">
+              <a href="detail.html?post=${i}&type=${type}">
                 <h2>${meta.title}</h2>
                 <div class="post-date">${meta.date}</div>
                 <p>${meta.desc}</p>
               </a>
             `;
-            introContainer.appendChild(cardDom);
+            container.appendChild(cardDom);
             i++;
           } catch (err) {
-            console.log(`找不到 ${folderName}，结束遍历`);
+            console.log(`找不到 ${folderPath}/${folderName}，结束遍历`);
             break;
           }
         }
       }
 
-      loadIntroCards();
+      // 个人介绍：读 intro 文件夹
+      loadCards("intro-card-container", "intro", "intro");
+      // 帖子分享：读 posts 文件夹
+      loadCards("posts-card-container", "posts", "posts");
     </script>
   </body>
 </html>
